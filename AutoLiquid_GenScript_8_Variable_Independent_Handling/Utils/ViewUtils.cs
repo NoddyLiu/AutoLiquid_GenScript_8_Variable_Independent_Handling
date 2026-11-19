@@ -265,9 +265,17 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
             else if (span == ESpan.Three)
             {
                 // A1左上角
+                //if (ParamsHelper.CommonSettingList[headUsedIndex].A1Pos == EA1Pos.LeftTop)
+                //{
+                //    Grid.SetRowSpan(templateReal, 3);
+                //    Grid.SetColumnSpan(templateReal, ConstantsUtils.TemplateOccupyGridSpan * 2);
+                //}
                 if (ParamsHelper.CommonSettingList[headUsedIndex].A1Pos == EA1Pos.LeftTop)
                 {
-                    Grid.SetRowSpan(templateReal, 3);
+                    // EP管架占 1.5 行（3个Grid行）× 2列（4个Grid列）
+                    // 第1行EP在Grid第0行，第2行EP在Grid第3行 → 两行EP之间不重叠（与实际盘面一致）
+                    Grid.SetRow(templateReal, rowIndex * (ConstantsUtils.TemplateOccupyGridSpan + 1));
+                    Grid.SetRowSpan(templateReal, ConstantsUtils.TemplateOccupyGridSpan + 1);
                     Grid.SetColumnSpan(templateReal, ConstantsUtils.TemplateOccupyGridSpan * 2);
                 }
                 // A1左下角

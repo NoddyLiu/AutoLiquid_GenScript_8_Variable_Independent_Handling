@@ -97,6 +97,11 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Window
                 this.GroupBoxSpeed.Visibility = Visibility.Collapsed;
 
             /**
+             * 偏移设置
+             */
+            this.GroupBoxOffset.Content = new ControlSettingOffset(this.mHeadIndex);
+
+            /**
              * 验证设置
              */
             this.GroupBoxVerify.Content = new ControlSettingVerify(this.mHeadIndex);
@@ -129,14 +134,9 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Window
                     this.BtnResetW.Visibility = Visibility.Visible;
                 else
                     this.BtnResetW.Visibility = Visibility.Collapsed;
-
-                // 喷液轴是否禁用
-                if (!ParamsHelper.HeadList[this.mHeadIndex].PAvailable)
-                    this.BtnResetP.Visibility = Visibility.Collapsed;
             }
             else
             {
-                this.BtnResetP.Visibility = Visibility.Collapsed;
                 this.BtnResetZ.Visibility = Visibility.Collapsed;
 
                 // 喷液轴是否禁用

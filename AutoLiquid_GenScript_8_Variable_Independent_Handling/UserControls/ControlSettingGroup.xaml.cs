@@ -1,9 +1,14 @@
-﻿using System;
+﻿using AutoLiquid_GenScript_8_Variable_Independent_Handling.EntityCommon;
+using AutoLiquid_GenScript_8_Variable_Independent_Handling.EntityJson;
+using AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils;
+using AutoLiquid_Library.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web.UI;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -14,10 +19,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using AutoLiquid_GenScript_8_Variable_Independent_Handling.EntityJson;
-using AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils;
-using AutoLiquid_Library.Enum;
-using AutoLiquid_GenScript_8_Variable_Independent_Handling.EntityCommon;
 using CheckBox = System.Windows.Controls.CheckBox;
 using DataHelper = AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils.DataHelper;
 using MessageBox = System.Windows.MessageBox;
@@ -96,6 +97,13 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.UserControls
                     {
                         templateIndexTick += 1;
                         var template = new ControlTemplateSetting(this.mConsumable, this.mGroupIndex, templateIndexTick, mHeadIndex);
+
+                        // 如果耗材是跨盘位，隐藏相应的盘位设置
+                        if (this.mConsumable.TemplateOccupySpan == ESpan.Three && !ConstantsUtils.EPTemplateIndexList.Contains(templateIndexTick))
+                        {
+                            template.Visibility = Visibility.Collapsed;
+                        }
+
                         Grid.SetRow(template, row);
                         Grid.SetColumn(template, col);
                         this.GridDynamic.Children.Add(template);

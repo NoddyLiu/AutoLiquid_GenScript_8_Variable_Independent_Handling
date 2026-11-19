@@ -357,12 +357,12 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
                                 if (headChannelCol > 1)
                                 {
                                     if (tipChannelRow == headChannelRow)
-                                        tipTakeStartIndex = new HoleIndex { OriIndex = oriIndex, XHoleOffset = xHoleOffset };
+                                        tipTakeStartIndex = new HoleIndex { OriIndex = oriIndex };
                                     else
-                                        tipTakeStartIndex = new HoleIndex { OriIndex = oriIndex, XHoleOffset = xHoleOffset, YHoleOffset = yHoleOffset };
+                                        tipTakeStartIndex = new HoleIndex { OriIndex = oriIndex };
                                 }
                                 else
-                                    tipTakeStartIndex = new HoleIndex { OriIndex = oriIndex, YHoleOffset = yHoleOffset };
+                                    tipTakeStartIndex = new HoleIndex { OriIndex = oriIndex};
                             }
 
                             isBreakParentLoop = true;
@@ -454,12 +454,12 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
                                 if (headChannelRow > 1)
                                 {
                                     if (tipChannelCol == headChannelCol)
-                                        tipTakeStartIndex = new HoleIndex { OriIndex = tipBoxRow, YHoleOffset = yHoleOffset };
+                                        tipTakeStartIndex = new HoleIndex { OriIndex = tipBoxRow};
                                     else
-                                        tipTakeStartIndex = new HoleIndex { OriIndex = tipBoxRow, XHoleOffset = xHoleOffset, YHoleOffset = yHoleOffset };
+                                        tipTakeStartIndex = new HoleIndex { OriIndex = tipBoxRow };
                                 }
                                 else
-                                    tipTakeStartIndex = new HoleIndex { OriIndex = tipBoxRow, XHoleOffset = xHoleOffset };
+                                    tipTakeStartIndex = new HoleIndex { OriIndex = tipBoxRow };
                             }
                             isBreakParentLoop = true;
                             break;
@@ -528,12 +528,12 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
                                 if (headChannelCol > 1)
                                 {
                                     if (tipChannelRow == headChannelRow)
-                                        tipTakeStartIndex = new HoleIndex { OriIndex = takeTipLeft2Right ? tipBoxCol : 0, XHoleOffset = xHoleOffset };
+                                        tipTakeStartIndex = new HoleIndex { OriIndex = takeTipLeft2Right ? tipBoxCol : 0 };
                                     else
-                                        tipTakeStartIndex = new HoleIndex { OriIndex = takeTipLeft2Right ? tipBoxCol : 0, XHoleOffset = xHoleOffset, YHoleOffset = yHoleOffset };
+                                        tipTakeStartIndex = new HoleIndex { OriIndex = takeTipLeft2Right ? tipBoxCol : 0 };
                                 }
                                 else
-                                    tipTakeStartIndex = new HoleIndex { OriIndex = tipBoxCol, YHoleOffset = yHoleOffset };
+                                    tipTakeStartIndex = new HoleIndex { OriIndex = tipBoxCol };
                             }
 
                             isBreakParentLoop = true;
@@ -620,12 +620,12 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
                                 if (headChannelRow > 1)
                                 {
                                     if (tipChannelCol == headChannelCol)
-                                        tipTakeStartIndex = new HoleIndex { OriIndex = oriIndex, YHoleOffset = yHoleOffset };
+                                        tipTakeStartIndex = new HoleIndex { OriIndex = oriIndex };
                                     else
-                                        tipTakeStartIndex = new HoleIndex { OriIndex = oriIndex, XHoleOffset = xHoleOffset, YHoleOffset = yHoleOffset };
+                                        tipTakeStartIndex = new HoleIndex { OriIndex = oriIndex};
                                 }
                                 else
-                                    tipTakeStartIndex = new HoleIndex { OriIndex = oriIndex, XHoleOffset = xHoleOffset };
+                                    tipTakeStartIndex = new HoleIndex { OriIndex = oriIndex};
                             }
 
                             isBreakParentLoop = true;

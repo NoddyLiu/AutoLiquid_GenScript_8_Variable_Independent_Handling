@@ -1,0 +1,69 @@
+﻿<UserControl x:Class="AutoLiquid_GenScript_8_Variable_Independent_Handling.UserControls.ControlSettingOffset"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AutoLiquid_GenScript_8_Variable_Independent_Handling.UserControls"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" 
+             Background="White">
+    <UserControl.Resources>
+        <system:Double x:Key="TitleWidth">178</system:Double>
+    </UserControl.Resources>
+
+    <Grid>
+        <StackPanel Orientation="Vertical">
+            <StackPanel x:Name="StackPanelOffsetZ" Orientation="Horizontal" Margin="0,5,0,0" ToolTip="{StaticResource OffsetRelative2Z1}">
+                <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+                    <Label HorizontalContentAlignment="Center" Content="{StaticResource OffsetZ2}"  FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                    <Label Width="{StaticResource SettingColonWidth}" Content=":" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                    <TextBox x:Name="TextBoxOffsetZ2" Width="{StaticResource SettingValueWidth}" HorizontalContentAlignment="Center" Text="0" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                    <Label Width="{StaticResource SettingUnitWidth}" Content="mm" HorizontalContentAlignment="Center" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+                    <Label HorizontalContentAlignment="Center" Content="{StaticResource OffsetZ3}"  FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                    <Label Width="{StaticResource SettingColonWidth}" Content=":" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                    <TextBox x:Name="TextBoxOffsetZ3" Width="{StaticResource SettingValueWidth}" HorizontalContentAlignment="Center" Text="0" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                    <Label Width="{StaticResource SettingUnitWidth}" Content="mm" HorizontalContentAlignment="Center" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+                    <Label HorizontalContentAlignment="Center" Content="{StaticResource OffsetZ4}"  FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                    <Label Width="{StaticResource SettingColonWidth}" Content=":" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                    <TextBox x:Name="TextBoxOffsetZ4" Width="{StaticResource SettingValueWidth}" HorizontalContentAlignment="Center" Text="0" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                    <Label Width="{StaticResource SettingUnitWidth}" Content="mm" HorizontalContentAlignment="Center" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+                    <Label HorizontalContentAlignment="Center" Content="{StaticResource OffsetZ5}"  FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                    <Label Width="{StaticResource SettingColonWidth}" Content=":" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                    <TextBox x:Name="TextBoxOffsetZ5" Width="{StaticResource SettingValueWidth}" HorizontalContentAlignment="Center" Text="0" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                    <Label Width="{StaticResource SettingUnitWidth}" Content="mm" HorizontalContentAlignment="Center" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+                    <Label HorizontalContentAlignment="Center" Content="{StaticResource OffsetZ6}"  FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                    <Label Width="{StaticResource SettingColonWidth}" Content=":" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                    <TextBox x:Name="TextBoxOffsetZ6" Width="{StaticResource SettingValueWidth}" HorizontalContentAlignment="Center" Text="0" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                    <Label Width="{StaticResource SettingUnitWidth}" Content="mm" HorizontalContentAlignment="Center" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+                    <Label HorizontalContentAlignment="Center" Content="{StaticResource OffsetZ7}"  FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                    <Label Width="{StaticResource SettingColonWidth}" Content=":" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                    <TextBox x:Name="TextBoxOffsetZ7" Width="{StaticResource SettingValueWidth}" HorizontalContentAlignment="Center" Text="0" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                    <Label Width="{StaticResource SettingUnitWidth}" Content="mm" HorizontalContentAlignment="Center" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+                    <Label HorizontalContentAlignment="Center" Content="{StaticResource OffsetZ8}"  FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                    <Label Width="{StaticResource SettingColonWidth}" Content=":" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                    <TextBox x:Name="TextBoxOffsetZ8" Width="{StaticResource SettingValueWidth}" HorizontalContentAlignment="Center" Text="0" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                    <Label Width="{StaticResource SettingUnitWidth}" Content="mm" HorizontalContentAlignment="Center" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -1702,12 +1702,7 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
             var pos = new Position();
 
             // log holeIndex的信息
-            LogHelper.Info("holeIndex信息：",
-                           $"OriIndex={holeIndex.OriIndex}, " +
-                           $"XHoleOffset={holeIndex.XHoleOffset}, " +
-                           $"YHoleOffset={holeIndex.YHoleOffset}, " +
-                           $"StepNotSameX={holeIndex.StepNotSameX}, " +
-                           $"StepNotSameY={holeIndex.StepNotSameY}");
+            LogHelper.Info("holeIndex信息：", $"OriIndex={holeIndex.OriIndex}");
 
             /*
               * 获取所有可变值
@@ -1729,20 +1724,13 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
             var holeStep = consumableType.HoleStep;
             // 孔位Index
             var oriIndex = holeIndex.OriIndex;
-            // 孔位偏移
-            var xHoleOffset = holeIndex.XHoleOffset;
-            var yHoleOffset = holeIndex.YHoleOffset;
-            // 移液头通道间距与耗材间距是否不一致（如果不一致，先走移液头的偏移，再走耗材的偏移）
-            var stepNotSameX = holeIndex.StepNotSameX;
-            var stepNotSameY = holeIndex.StepNotSameY;
 
             var xIndex = 0;
             var yIndex = 0;
-
-            if (oriIndex != 0)
+            if (oriIndex > 0)
             {
                 // A1位置：左上
-                if (a1Pos == EA1Pos.LeftTop)
+                if (commonSetting.A1Pos == EA1Pos.LeftTop)
                 {
                     // 每列孔数
                     xIndex = oriIndex / rowCount;
@@ -1757,57 +1745,18 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
                 }
             }
 
-            /**
-             * x轴位置
-             */
-            decimal xa = holeStartPos.X + holeStep.X * xIndex;
-            // 移液头通道间距与耗材间距不一致
-            if (stepNotSameX)
-            {
-                // 如果耗材x间距为0，直接走移液头通道间距偏移
-                if (xHoleOffset < 0)
-                    xa += holeStep.X == 0 ? head.ChannelStep * xHoleOffset : (head.ChannelCol - 1) * head.ChannelStep * -1;
-                else if (xHoleOffset > 0)
-                    xa += holeStep.X == 0 ? head.ChannelStep * xHoleOffset : (head.ChannelCol - 1) * head.ChannelStep;
-                else
-                    // xa += takeTipLeft2Right ? (head.ChannelCol - 1) * head.ChannelStep * -1 : (head.ChannelCol - 1) * head.ChannelStep;
-                    xa += takeTipLeft2Right ? (head.ChannelCol - 1) * head.ChannelStep * -1 : 0; // 2025-10-18修改
-            }
-            else
-                xa += holeStep.X * xHoleOffset;
-            /**
-             * y轴位置
-             */
+            // x、y轴位置
+            var xa = consumableType.HoleStartPosList[templateIndex].X + consumableType.HoleStep.X * xIndex;
             // 由于标准Y轴是盘推出，和多个移液头Y轴（Y轴由头移动）有差异
-            var ya = holeStartPos.Y;
+            var ya = consumableType.HoleStartPosList[templateIndex].Y;
             if (ParamsHelper.HeadList[headUsedIndex].Available && ParamsHelper.HeadList[headUsedIndex].YMoveWithHead)
-                ya = a1Pos == EA1Pos.LeftTop ? ya + holeStep.Y * yIndex : ya - holeStep.Y * yIndex;
+                ya = commonSetting.A1Pos == EA1Pos.LeftTop
+                    ? ya - consumableType.HoleStep.Y * yIndex
+                    : ya + consumableType.HoleStep.Y * yIndex;
             else
-                ya = a1Pos == EA1Pos.LeftTop ? ya - holeStep.Y * yIndex : ya + holeStep.Y * yIndex;
-            // 移液头通道间距与耗材间距不一致
-            if (stepNotSameY)
-            {
-                // 如果耗材y间距为0，直接走移液头通道间距偏移
-                if (yHoleOffset < 0)
-                {
-                    if (holeStep.Y == 0)
-                        ya += head.ChannelStep * yHoleOffset;
-                    else
-                        // ya += a1Pos == EA1Pos.LeftTop ? (head.ChannelRow - 1) * head.ChannelStep * -1 : (head.ChannelRow - 1) * head.ChannelStep;
-                        ya += (head.ChannelRow - 1) * head.ChannelStep * -1;
-                }
-                else if (yHoleOffset > 0)
-                {
-                    if (holeStep.Y == 0)
-                        ya += head.ChannelStep * yHoleOffset;
-                    else
-                        // ya += a1Pos == EA1Pos.LeftTop ? (head.ChannelRow - 1) * head.ChannelStep : (head.ChannelRow - 1) * head.ChannelStep * -1;
-                        ya += (head.ChannelRow - 1) * head.ChannelStep;
-                }
-            }
-            else
-                ya += holeStep.Y * yHoleOffset;
-
+                ya = commonSetting.A1Pos == EA1Pos.LeftTop
+                    ? ya + consumableType.HoleStep.Y * yIndex
+                    : ya - consumableType.HoleStep.Y * yIndex;
             // 赋值位置信息
             pos.X = xa;
             pos.Y = ya;
@@ -1834,14 +1783,6 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
             var cmd = string.Empty;
             foreach (var ch in channels)
                 cmd += ObjectUtils.GetMotionCmd(HEAD_Z_AXIS_LIST[ch - 1], EActType.A, height.ToString("F2")) + ",";
-
-            // 未使用的通道回零（Z=0为最高位），避免无枪头通道下探碰板
-            var totalChannel = ParamsHelper.HeadList[0].ChannelRow * ParamsHelper.HeadList[0].ChannelCol;
-            for (var ch = 1; ch <= totalChannel; ch++)
-            {
-                if (channels.Contains(ch)) continue;
-                cmd += ObjectUtils.GetMotionCmd(HEAD_Z_AXIS_LIST[ch - 1], EActType.A, "0.00") + ",";
-            }
 
             return DoCmd(cmd.Substring(0, cmd.Length - 1), isNeedManualStop);
         }
@@ -2115,12 +2056,17 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
                 //SpeedSetSub(HEAD_Z_AXIS_LIST[headUsedIndex], commonSetting.DefaultZSpeed, commonSetting.ZSpeedPercent, isNeedManualStop);
                 //if (ParamsHelper.HeadList[headUsedIndex].PAvailable)
                 //    SpeedSetSub(HEAD_P_AXIS_LIST[headUsedIndex], commonSetting.DefaultPSpeed, commonSetting.PSpeedPercent, isNeedManualStop);
-
+                var zSpeedCmd = "";
+                var pSpeedCmd = "";
                 for (var x = 1; x < 9; x++)
                 {
-                    SpeedSetSub(HEAD_Z_AXIS_LIST[x - 1], commonSetting.DefaultZSpeed, commonSetting.ZSpeedPercent, isNeedManualStop);
-                    SpeedSetSub(HEAD_P_AXIS_LIST[x - 1], commonSetting.DefaultPSpeed, commonSetting.PSpeedPercent, isNeedManualStop);
+                    zSpeedCmd += ObjectUtils.CalcSpeedCmdValueByPercent(HEAD_Z_AXIS_LIST[x - 1], "0", commonSetting.ZSpeedPercent) + ",";
+                    pSpeedCmd += ObjectUtils.CalcSpeedCmdValueByPercent(HEAD_P_AXIS_LIST[x - 1], "0", commonSetting.PSpeedPercent) + ",";
                 }
+                if (!string.IsNullOrEmpty(zSpeedCmd))
+                    DoCmd(zSpeedCmd.Substring(0, zSpeedCmd.Length - 1), isNeedManualStop);
+                if (!string.IsNullOrEmpty(pSpeedCmd))
+                    DoCmd(pSpeedCmd.Substring(0, pSpeedCmd.Length - 1), isNeedManualStop);
             }
             else if (axis == EAxis.X)
             {
@@ -2132,18 +2078,28 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
             }
             else if (axis == EAxis.Z)
             {
+                var zSpeedCmd = "";
                 for (var x = 1; x < 9; x++)
                 {
-                    SpeedSetSub(HEAD_Z_AXIS_LIST[x - 1], commonSetting.DefaultZSpeed, commonSetting.ZSpeedPercent, isNeedManualStop);
+                    speedCmd = ObjectUtils.CalcSpeedCmdValueByPercent(HEAD_Z_AXIS_LIST[x - 1], commonSetting.DefaultZSpeed, commonSetting.ZSpeedPercent);
+                    if (speedCmd != "")
+                        zSpeedCmd += speedCmd + ",";
                 }
+                if (!string.IsNullOrEmpty(zSpeedCmd))
+                    DoCmd(zSpeedCmd.Substring(0, zSpeedCmd.Length - 1), isNeedManualStop);
             }
             else if (axis == EAxis.P)
             {
+                var pSpeedCmd = "";
                 if (ParamsHelper.HeadList[headUsedIndex].PAvailable)
                     for (var x = 1; x < 9; x++)
                     {
-                        SpeedSetSub(HEAD_P_AXIS_LIST[x - 1], commonSetting.DefaultPSpeed, commonSetting.PSpeedPercent, isNeedManualStop);
+                        speedCmd = ObjectUtils.CalcSpeedCmdValueByPercent(HEAD_P_AXIS_LIST[x - 1], commonSetting.DefaultPSpeed, commonSetting.PSpeedPercent);
+                        if(speedCmd != "")
+                            pSpeedCmd += speedCmd + ",";
                     }
+                if (!string.IsNullOrEmpty(pSpeedCmd))
+                    DoCmd(pSpeedCmd.Substring(0, pSpeedCmd.Length - 1), isNeedManualStop);
             }
         }
 

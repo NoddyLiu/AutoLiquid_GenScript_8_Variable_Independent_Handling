@@ -2,7 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:s="clr-namespace:System;assembly=mscorlib">
 
-    <s:String x:Key="ProcessesName">AutoLiquid_GenScript_Single_Handling</s:String>
+    <s:String x:Key="ProcessesName">AutoLiquid_GenScript_8_Variable_Independent_Handling</s:String>
     <s:String x:Key="AppName">单通道分装工作站</s:String>
     <s:String x:Key="LiquidWorkstation">移液工作站</s:String>
     <s:String x:Key="Channel">通道</s:String>
@@ -15,9 +15,9 @@
     <s:String x:Key="LaunchPlate">推出盘位</s:String>
     <s:String x:Key="ResetX">X轴复位</s:String>
     <s:String x:Key="ResetY">Y轴复位</s:String>
-    <s:String x:Key="ResetZ">Z轴复位</s:String>
-    <s:String x:Key="ResetP">P轴复位</s:String>
-    <s:String x:Key="ResetW">W轴复位</s:String>
+    <s:String x:Key="ResetZ">Z1~Z8轴复位</s:String>
+    <s:String x:Key="ResetP">P1~P8轴复位</s:String>
+    <s:String x:Key="ResetW">变距轴复位</s:String>
     <s:String x:Key="ResetQ">Q轴复位</s:String>
     <s:String x:Key="ResetAll">全部复位</s:String>
     <s:String x:Key="Import">导入</s:String>
@@ -89,6 +89,7 @@
     <s:String x:Key="About">关于</s:String>
     <s:String x:Key="Copyright" xml:space="preserve">版权所有(C)2026 超氢智能，所有权均保留。&#13;网址：www.superh2.cn&#13;电话：0757-22220030</s:String>
     <s:String x:Key="SettingSpeed">速度设置</s:String>
+    <s:String x:Key="SettingOffset">偏移设置</s:String>
     <s:String x:Key="SpeedCmd">速度指令</s:String>
     <s:String x:Key="Percent">百分比</s:String>
     <s:String x:Key="MixingSetting">混合设定</s:String>
@@ -267,6 +268,14 @@
     <s:String x:Key="EpRackScanProgress">已完成 {0} / {1} 支</s:String>
     <s:String x:Key="EpRackScanAllPassed">✔ EP管架所有管扫码通过</s:String>
     <s:String x:Key="EpRackScanInProgress">【{0}】EP管架逐管扫码中...</s:String>
+    <s:String x:Key="OffsetZ2">Z2偏移</s:String>
+    <s:String x:Key="OffsetZ3">Z3偏移</s:String>
+    <s:String x:Key="OffsetZ4">Z4偏移</s:String>
+    <s:String x:Key="OffsetZ5">Z5偏移</s:String>
+    <s:String x:Key="OffsetZ6">Z6偏移</s:String>
+    <s:String x:Key="OffsetZ7">Z7偏移</s:String>
+    <s:String x:Key="OffsetZ8">Z8偏移</s:String>
+    <s:String x:Key="OffsetRelative2Z1">相对Z1偏移</s:String>
 
     <!--提示-->
     <s:String x:Key="Prompt">提示</s:String>

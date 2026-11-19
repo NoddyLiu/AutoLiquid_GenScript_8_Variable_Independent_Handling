@@ -154,6 +154,9 @@
     <Compile Include="UserControls\ControlSettingTakeTip.xaml.cs">
       <DependentUpon>ControlSettingTakeTip.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\ControlSettingOffset.xaml.cs">
+      <DependentUpon>ControlSettingOffset.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\ControlSettingVolume.xaml.cs">
       <DependentUpon>ControlSettingVolume.xaml</DependentUpon>
     </Compile>
@@ -298,6 +301,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UserControls\ControlSettingTakeTip.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\ControlSettingOffset.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

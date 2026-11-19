@@ -1714,7 +1714,7 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling
                 const int volumeCol = 8;  // H: Volume（体积）
 
                 // ── 盘面布局常量 ──
-                var tipTemplateIndexCandidates = new List<int> { 0, 5, 10, 15 };
+                
                 int totalTemplateCount = ParamsHelper.Layout.ColCount * ParamsHelper.Layout.RowCount;
                 const int headUsedIndex = 0;
                 var a1Pos = ParamsHelper.CommonSettingList[headUsedIndex].A1Pos;
@@ -1835,20 +1835,20 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling
                     }
                 }
 
+
                 // ══════════════════════════════════════════════════════════════
                 // ── 动态分配轮次与盘位（按输入行顺序逐行贪心分配） ──
                 //    保证同一行的 srcLabel 和 dstLabel 必须属于同一轮
                 // ══════════════════════════════════════════════════════════════
 
                 int totalTipBoxCount = Math.Min(
-                    tipTemplateIndexCandidates.Count,
+                    ConstantsUtils.TipTemplateIndexList.Count,
                     (dataRows.Count + tipBoxCapacity - 1) / tipBoxCapacity);
-                var tipIndexSet = new HashSet<int>(tipTemplateIndexCandidates.Take(totalTipBoxCount));
+                var tipIndexSet = new HashSet<int>(ConstantsUtils.TipTemplateIndexList.Take(totalTipBoxCount));
 
                 // 盘位21（index=20）固定作为退枪头位置，源盘/靶盘不可占用
-                const int releaseTipPlateIndex = 20;
                 var availablePlateSlots = Enumerable.Range(0, totalTemplateCount)
-                    .Where(idx => !tipIndexSet.Contains(idx) && idx != releaseTipPlateIndex)
+                    .Where(idx => !tipIndexSet.Contains(idx) && idx != ConstantsUtils.ReleaseTipTemplateIndex)
                     .ToList();
                 int maxPlatesPerRound = availablePlateSlots.Count;
 
@@ -1863,58 +1863,204 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling
                 var roundPlateTemplateIndexMap = new List<Dictionary<string, int>>();
                 var groupRound = new int[groupRowIndexList.Count];
 
+                //{
+                //    var currentPlateMap = new Dictionary<string, int>();
+                //    int currentSlotIndex = 0;
+                //    int currentRound = 1;
+
+                //    for (int g = 0; g < groupRowIndexList.Count; g++)
+                //    {
+                //        var src = dataRows[groupRowIndexList[g][0]].srcLabel;
+                //        var dst = dataRows[groupRowIndexList[g][0]].dstLabel;
+
+                //        int slotsNeeded = 0;
+                //        if (!currentPlateMap.ContainsKey(src)) slotsNeeded++;
+                //        if (!currentPlateMap.ContainsKey(dst) && dst != src) slotsNeeded++;
+
+                //        if (currentSlotIndex + slotsNeeded > maxPlatesPerRound)
+                //        {
+                //            roundPlateTemplateIndexMap.Add(currentPlateMap);
+                //            currentPlateMap = new Dictionary<string, int>();
+                //            currentSlotIndex = 0;
+                //            currentRound++;
+                //        }
+
+                //        if (!currentPlateMap.ContainsKey(src))
+                //        {
+                //            if (currentSlotIndex >= availablePlateSlots.Count)
+                //            {
+                //                // 再次开新轮（保险）
+                //                roundPlateTemplateIndexMap.Add(currentPlateMap);
+                //                currentPlateMap = new Dictionary<string, int>();
+                //                currentSlotIndex = 0;
+                //                currentRound++;
+                //            }
+                //            currentPlateMap[src] = availablePlateSlots[currentSlotIndex++];
+                //        }
+
+                //        if (!currentPlateMap.ContainsKey(dst) && dst != src)
+                //        {
+                //            if (currentSlotIndex >= availablePlateSlots.Count)
+                //            {
+                //                roundPlateTemplateIndexMap.Add(currentPlateMap);
+                //                currentPlateMap = new Dictionary<string, int>();
+                //                currentSlotIndex = 0;
+                //                currentRound++;
+                //            }
+                //            currentPlateMap[dst] = availablePlateSlots[currentSlotIndex++];
+                //        }
+
+                //        groupRound[g] = currentRound;
+                //    }
+
+                //    if (currentPlateMap.Count > 0)
+                //        roundPlateTemplateIndexMap.Add(currentPlateMap);
+                //}
                 {
-                    var currentPlateMap = new Dictionary<string, int>();
-                    int currentSlotIndex = 0;
-                    int currentRound = 1;
-
-                    for (int g = 0; g < groupRowIndexList.Count; g++)
+                    // 耗材类型 → 占用盘位属性（ESpan）缓存
+                    var consumableSpanCache = new Dictionary<string, ESpan>();
+                    // 取耗材的占用盘位属性
+                    ESpan GetConsumableSpan(string consumableTypeName)
                     {
-                        var src = dataRows[groupRowIndexList[g][0]].srcLabel;
-                        var dst = dataRows[groupRowIndexList[g][0]].dstLabel;
-
-                        int slotsNeeded = 0;
-                        if (!currentPlateMap.ContainsKey(src)) slotsNeeded++;
-                        if (!currentPlateMap.ContainsKey(dst) && dst != src) slotsNeeded++;
-
-                        if (currentSlotIndex + slotsNeeded > maxPlatesPerRound)
+                        if (!consumableSpanCache.TryGetValue(consumableTypeName, out var span))
                         {
-                            roundPlateTemplateIndexMap.Add(currentPlateMap);
-                            currentPlateMap = new Dictionary<string, int>();
-                            currentSlotIndex = 0;
-                            currentRound++;
+                            var consumableType = ConsumableHelper.GetConsumableType(headUsedIndex, consumableTypeName, false);
+                            span = consumableType != null ? consumableType.TemplateOccupySpan : ESpan.One;
+                            consumableSpanCache[consumableTypeName] = span;
                         }
-
-                        if (!currentPlateMap.ContainsKey(src))
-                        {
-                            if (currentSlotIndex >= availablePlateSlots.Count)
-                            {
-                                // 再次开新轮（保险）
-                                roundPlateTemplateIndexMap.Add(currentPlateMap);
-                                currentPlateMap = new Dictionary<string, int>();
-                                currentSlotIndex = 0;
-                                currentRound++;
-                            }
-                            currentPlateMap[src] = availablePlateSlots[currentSlotIndex++];
-                        }
-
-                        if (!currentPlateMap.ContainsKey(dst) && dst != src)
-                        {
-                            if (currentSlotIndex >= availablePlateSlots.Count)
-                            {
-                                roundPlateTemplateIndexMap.Add(currentPlateMap);
-                                currentPlateMap = new Dictionary<string, int>();
-                                currentSlotIndex = 0;
-                                currentRound++;
-                            }
-                            currentPlateMap[dst] = availablePlateSlots[currentSlotIndex++];
-                        }
-
-                        groupRound[g] = currentRound;
+                        return span;
                     }
 
-                    if (currentPlateMap.Count > 0)
+                    int groupIndex = 0;
+                    int currentRound = 1;
+                    while (groupIndex < groupRowIndexList.Count)
+                    {
+                        // ── ① 试算：本轮能装下哪些组 ──
+                        //    EP管架（占2行×2列）按本轮EP个数预留专用盘位；
+                        //    本轮没有EP管架时，EP专用盘位照常当普通盘位使用。
+                        var roundLabelSet = new HashSet<string>();
+                        int roundPlateCount = 0;
+                        int roundEpCount = 0;
+                        int roundEnd = groupIndex;
+                        while (roundEnd < groupRowIndexList.Count)
+                        {
+                            var row = dataRows[groupRowIndexList[roundEnd][0]];
+                            var newLabelList = new List<string>();
+                            int needCount = 0;
+                            int needEpCount = 0;
+                            if (!roundLabelSet.Contains(row.srcLabel) && !newLabelList.Contains(row.srcLabel))
+                            {
+                                newLabelList.Add(row.srcLabel);
+                                needCount++;
+                                if (GetConsumableSpan(row.srcType) == ESpan.Three) needEpCount++;
+                            }
+                            if (row.dstLabel != row.srcLabel && !roundLabelSet.Contains(row.dstLabel) && !newLabelList.Contains(row.dstLabel))
+                            {
+                                newLabelList.Add(row.dstLabel);
+                                needCount++;
+                                if (GetConsumableSpan(row.dstType) == ESpan.Three) needEpCount++;
+                            }
+
+                            int epCount = roundEpCount + needEpCount;
+                            // EP专用盘位只有4个，超过就放到下一轮
+                            if (epCount > ConstantsUtils.EPTemplateIndexList.Count)
+                                break;
+                            // 本轮EP管架连带占用的盘位数
+                            int epReservedCount = ConstantsUtils.GetEPTemplateReservedIndexList(epCount).Count;
+                            // 本轮能放的盘数 = 普通盘可用数 + EP盘位数
+                            int canPlaceCount = availablePlateSlots.Count - epReservedCount + epCount;
+                            if (roundPlateCount + needCount > canPlaceCount)
+                                break;
+
+                            foreach (var label in newLabelList) roundLabelSet.Add(label);
+                            roundPlateCount += needCount;
+                            roundEpCount = epCount;
+                            roundEnd++;
+                        }
+                        if (roundEnd == groupIndex)
+                            roundEnd = groupIndex + 1; // 保险：每轮至少放一组
+
+                        // ── ② 本轮盘位分配：先分EP管架，再分普通耗材 ──
+                        var currentPlateMap = new Dictionary<string, int>();
+                        // 本轮已占用盘位（含EP管架连带覆盖的盘位）
+                        var currentUsedSlotSet = new HashSet<int>();
+                        // 本轮已用EP管架个数（决定用第几个EP专用盘位）
+                        int usedEPCount = 0;
+
+                        // 取EP专用盘位：按顺序，第N个EP管架用第N个EP专用盘位
+                        int TakeEPSlot()
+                        {
+                            if (usedEPCount >= ConstantsUtils.EPTemplateIndexList.Count)
+                                return -1;
+                            var anchor = ConstantsUtils.EPTemplateIndexList[usedEPCount];
+                            foreach (var idx in ConstantsUtils.GetEPTemplateCoverIndexList(anchor))
+                                currentUsedSlotSet.Add(idx);
+                            usedEPCount++;
+                            return anchor;
+                        }
+
+                        // 取普通耗材盘位
+                        int TakeNormalSlot()
+                        {
+                            foreach (var idx in availablePlateSlots)
+                            {
+                                if (currentUsedSlotSet.Contains(idx))
+                                    continue;
+                                currentUsedSlotSet.Add(idx);
+                                return idx;
+                            }
+                            return -1;
+                        }
+
+                        // ②a 先分EP管架（占EP专用盘位，并连带占用其覆盖的盘位）
+                        for (int gi = groupIndex; gi < roundEnd; gi++)
+                        {
+                            var row = dataRows[groupRowIndexList[gi][0]];
+                            foreach (var plate in new[] { new { Label = row.srcLabel, Type = row.srcType }, new { Label = row.dstLabel, Type = row.dstType } })
+                            {
+                                if (currentPlateMap.ContainsKey(plate.Label))
+                                    continue;
+                                if (GetConsumableSpan(plate.Type) != ESpan.Three)
+                                    continue;
+                                var slot = TakeEPSlot();
+                                if (slot < 0)
+                                    slot = TakeNormalSlot();
+                                if (slot < 0)
+                                {
+                                    Dispatcher.Invoke(() => MessageBox.Show($"导入错误：第{row.row}行EP管架盘位分配失败，请检查盘面配置。"));
+                                    return false;
+                                }
+                                currentPlateMap[plate.Label] = slot;
+                            }
+                        }
+
+                        // ②b 再分普通耗材（避开EP管架已占用的盘位）
+                        for (int gi = groupIndex; gi < roundEnd; gi++)
+                        {
+                            var row = dataRows[groupRowIndexList[gi][0]];
+                            foreach (var plate in new[] { new { Label = row.srcLabel, Type = row.srcType }, new { Label = row.dstLabel, Type = row.dstType } })
+                            {
+                                if (currentPlateMap.ContainsKey(plate.Label))
+                                    continue;
+                                if (GetConsumableSpan(plate.Type) == ESpan.Three)
+                                    continue;
+                                var slot = TakeNormalSlot();
+                                if (slot < 0)
+                                {
+                                    Dispatcher.Invoke(() => MessageBox.Show($"导入错误：第{row.row}行源/靶盘盘位分配失败，请检查盘面配置。"));
+                                    return false;
+                                }
+                                currentPlateMap[plate.Label] = slot;
+                            }
+                        }
+
                         roundPlateTemplateIndexMap.Add(currentPlateMap);
+                        for (int gi = groupIndex; gi < roundEnd; gi++)
+                            groupRound[gi] = currentRound;
+
+                        groupIndex = roundEnd;
+                        currentRound++;
+                    }
                 }
 
                 int maxRound = roundPlateTemplateIndexMap.Count;
@@ -1925,9 +2071,12 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling
                 for (int g = 0; g < groupRowIndexList.Count; g++)
                 {
                     int tipCount = groupRowIndexList[g].Count;
-                    int slot = globalTipConsumed / tipBoxCapacity;
-                    int candidateIdx = slot % tipTemplateIndexCandidates.Count;
-                    groupTipTemplateIndex[g] = tipTemplateIndexCandidates[candidateIdx];
+                    // 一组要同时取 N 个枪头，必须整组取自同一个枪头盒；
+                    // 若本组跨过盒边界（盒里剩余枪头不够本组用），整组落到下一个盒子。
+                    // 所以按“本组最后一个枪头”所在的盒子来分配。
+                    int slot = (globalTipConsumed + tipCount - 1) / tipBoxCapacity;
+                    int candidateIdx = slot % ConstantsUtils.TipTemplateIndexList.Count;
+                    groupTipTemplateIndex[g] = ConstantsUtils.TipTemplateIndexList[candidateIdx];
                     globalTipConsumed += tipCount;
                 }
 
@@ -2111,7 +2260,10 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling
                 var isPumpLiquid = seq.IsPumpLiquid;
                 // 是否多通道移液
                 var isMultiChannel = sourceHoleIndexList.Count > 1 && targetHoleIndexList.Count > 1;
-
+                // 多通道：孔位已由 SourceHoleIndexList / TargetHoleIndexList 显式给出，
+                // 若再按 tipChannel 展开会把参考孔后面多画一个孔（A01/B01 → 多画 C01），
+                // 所以多通道时改用 1x1 逐孔精确刷新
+                var refreshTipChannel = isMultiChannel ? new int[1, 1] : tipChannel;
 
                 // 枪头盘位
                 if (!isPumpLiquid)
@@ -2201,9 +2353,14 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling
                         var controlTemplate = new ControlTemplateCommon(template, sourceTemplateConsumableType);
                         // controlTemplate.RefreshTemplateHolesStatus(headUsedIndex, sourceHoleIndex, tipChannel, sourceTotalVolume);
                         // 20250625 SourceHoleIndex改成SourceHoleIndexList
-                        foreach (var sourceHoleIndex in sourceHoleIndexList)
+                        for (var j = 0; j < sourceHoleIndexList.Count; j++)
                         {
-                            controlTemplate.RefreshTemplateHolesStatus(headUsedIndex, sourceHoleIndex, tipChannel, sourceTotalVolume);
+                            var sourceHoleIndex = sourceHoleIndexList[j];
+                            // 多通道：每个源孔只显示本通道的体积；其它模式显示整孔累计体积
+                            var sourceVolume = isMultiChannel && volumeEachList.Count > j
+                                ? volumeEachList[j].Original
+                                : sourceTotalVolume;
+                            controlTemplate.RefreshTemplateHolesStatus(headUsedIndex, sourceHoleIndex, refreshTipChannel, sourceVolume);
                         }
                         sourceTemplateDict.Add(sourceTemplateIndex, controlTemplate);
                         templateCanUse[sourceTemplateIndex].Children.Add(controlTemplate);
@@ -2212,11 +2369,16 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling
                     {
                         if (!sourceTemplateDict.TryGetValue(sourceTemplateIndex, out var controlTemplate))
                             return; // 该源盘位Index不存在
-                        // controlTemplate.RefreshTemplateHolesStatus(headUsedIndex, sourceHoleIndex, tipChannel, sourceTotalVolume);
-                        // 20250625 SourceHoleIndex改成SourceHoleIndexList
-                        foreach (var sourceHoleIndex in sourceHoleIndexList)
+                         // controlTemplate.RefreshTemplateHolesStatus(headUsedIndex, sourceHoleIndex, tipChannel, sourceTotalVolume);
+                         // 20250625 SourceHoleIndex改成SourceHoleIndexList
+                        for (var j = 0; j < sourceHoleIndexList.Count; j++)
                         {
-                            controlTemplate.RefreshTemplateHolesStatus(headUsedIndex, sourceHoleIndex, tipChannel, sourceTotalVolume);
+                            var sourceHoleIndex = sourceHoleIndexList[j];
+                            // 多通道：每个源孔只显示本通道的体积；其它模式显示整孔累计体积
+                            var sourceVolume = isMultiChannel && volumeEachList.Count > j
+                                ? volumeEachList[j].Original
+                                : sourceTotalVolume;
+                            controlTemplate.RefreshTemplateHolesStatus(headUsedIndex, sourceHoleIndex, refreshTipChannel, sourceVolume);
                         }
                     }
                 }
@@ -2257,7 +2419,7 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling
                             var targetVolumeEach = volumeEachList.Count > 1 ? volumeEachList[i] : volumeEachList[0];
                             // 多通道：每个靶孔只放本通道的体积；普通模式：靶孔体积 = 单孔体积 × 源孔数
                             var targetVolumeTotal = targetVolumeEach.Original * (isMultiChannel ? 1 : sourceHoleIndexList.Count);
-                            controlTemplate.RefreshTemplateHolesStatus(headUsedIndex, targetHoleIndexList[i], tipChannel, targetVolumeTotal);
+                            controlTemplate.RefreshTemplateHolesStatus(headUsedIndex, targetHoleIndexList[i], refreshTipChannel, targetVolumeTotal);
                         }
                         // 1靶多孔
                         else
@@ -2268,7 +2430,7 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling
                                 var targetVolumeEach = volumeEachList.Count > 1 ? volumeEachList[j] : volumeEachList[0];
                                 // 多通道：每个靶孔只放本通道的体积；普通模式：靶孔体积 = 单孔体积 × 源孔数
                                 var targetVolumeTotal = targetVolumeEach.Original * (isMultiChannel ? 1 : sourceHoleIndexList.Count);
-                                controlTemplate.RefreshTemplateHolesStatus(headUsedIndex, targetHoleIndex, tipChannel, targetVolumeTotal);
+                                controlTemplate.RefreshTemplateHolesStatus(headUsedIndex, targetHoleIndex, refreshTipChannel, targetVolumeTotal);
                             }
                         }
 
@@ -2286,7 +2448,7 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling
                             var targetVolumeEach = volumeEachList.Count > 1 ? volumeEachList[i] : volumeEachList[0];
                             // 多通道：每个靶孔只放本通道的体积；普通模式：靶孔体积 = 单孔体积 × 源孔数
                             var targetVolumeTotal = targetVolumeEach.Original * (isMultiChannel ? 1 : sourceHoleIndexList.Count);
-                            controlTemplate.RefreshTemplateHolesStatus(headUsedIndex, targetHoleIndexList[i], tipChannel, targetVolumeTotal);
+                            controlTemplate.RefreshTemplateHolesStatus(headUsedIndex, targetHoleIndexList[i], refreshTipChannel, targetVolumeTotal);
                         }
                         // 1靶多孔
                         else
@@ -2297,7 +2459,7 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling
                                 var targetVolumeEach = volumeEachList.Count > 1 ? volumeEachList[j] : volumeEachList[0];
                                 // 多通道：每个靶孔只放本通道的体积；普通模式：靶孔体积 = 单孔体积 × 源孔数
                                 var targetVolumeTotal = targetVolumeEach.Original * (isMultiChannel ? 1 : sourceHoleIndexList.Count);
-                                controlTemplate.RefreshTemplateHolesStatus(headUsedIndex, targetHoleIndex, tipChannel, targetVolumeTotal);
+                                controlTemplate.RefreshTemplateHolesStatus(headUsedIndex, targetHoleIndex, refreshTipChannel, targetVolumeTotal);
                             }
                         }
                     }
