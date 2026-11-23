@@ -87,9 +87,6 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.UserControls
             // 如果移液头不是推脱板退枪头，隐藏相关属性
             this.StackPanelReleaseTipPush.Visibility = ParamsHelper.HeadList[this.mHeadIndex].ReleaseTipUsePush ? Visibility.Visible : Visibility.Collapsed;
 
-            // 如果移液头2可用，隐藏推脱板轴属性
-            this.StackPanelReleaseTipAxis.Visibility = ParamsHelper.HeadList[1].Available ? Visibility.Collapsed : Visibility.Visible;
-
             // 如果移液头可变距，且退枪头方式为卡扣，显示退枪头变距属性
             this.StackPanelReleaseTipVariableDistanceStep.Visibility =
                 ParamsHelper.HeadList[this.mHeadIndex].IsVariable &&

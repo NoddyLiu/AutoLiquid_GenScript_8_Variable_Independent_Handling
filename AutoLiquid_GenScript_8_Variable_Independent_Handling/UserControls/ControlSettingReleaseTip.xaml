@@ -16,8 +16,8 @@
     <Grid>
         <StackPanel Orientation="Vertical" Margin="0,5,0,0">
             <!--退枪头方式-->
-            <StackPanel Orientation="Horizontal" Visibility="Collapsed">
-                <StackPanel x:Name="StackPanelOrientation" Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel x:Name="StackPanelOrientation" Orientation="Horizontal" Visibility="Collapsed">
                     <Label HorizontalContentAlignment="Center" Content="{StaticResource ReleaseTipMethod}" Width="{StaticResource SettingTitleWidth}" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
                     <Label Width="{StaticResource SettingColonWidth}" Content=":" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
                     <RadioButton x:Name="RBtnReleaseTipMethodPush" GroupName="ReleaseTipMethod" Content="{StaticResource PlatePush}" FontSize="{StaticResource MahApps.Font.Size.Default}" VerticalAlignment="Center" IsChecked="True"/>
@@ -26,7 +26,7 @@
 
                 <StackPanel x:Name="StackPanelReleaseTipPush" Orientation="Horizontal">
                     <!--退枪头轴-->
-                    <StackPanel x:Name="StackPanelReleaseTipAxis" Orientation="Horizontal">
+                    <StackPanel x:Name="StackPanelReleaseTipAxis" Orientation="Horizontal"  Visibility="Collapsed">
                         <Label Width="{StaticResource SettingTitleWidth}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Content="{StaticResource ReleaseTipAxis}" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
                         <Label Width="{StaticResource SettingColonWidth}" Content=":" FontSize="{StaticResource MahApps.Font.Size.Default}"/>
                         <RadioButton x:Name="RBtnReleaseTipAxisP" GroupName="ReleaseTipAxis" Content="P" FontSize="{StaticResource MahApps.Font.Size.Default}" VerticalAlignment="Center" IsChecked="True"/>

@@ -306,47 +306,105 @@ namespace DAERun
                     singleCmd = "WAIT " + (int)ints;
 
                 }
-                else if (actType == "A" || actType == "S")
+                else if (actType == "A")
                 {
-                    decimal value = singleCmd.Contains("@") ? decimal.Parse(singleCmd.Substring(2, singleCmd.IndexOf("@") - 2)) : decimal.Parse(singleCmd.Substring(2));
-                    var step = 0.0;
-                    // 尾部，例如包含@指令
-                    var tail = "";
                     if (axi == "X")
-                    { 
-                        // @指令
+                    {
                         if (singleCmd.Contains("@"))
                         {
+                            decimal value2 = decimal.Parse(singleCmd.Substring(2, singleCmd.LastIndexOf("@") - 2));
                             if (singleCmd.ToUpper().Contains("@Z"))
                             {
-                                ints = value * workPlate.ZXcale;
+                                ints = (workPlate.WorkPlateX0 + value2) * workPlate.ZXcale;
                             }
-                            tail = singleCmd.Substring(singleCmd.IndexOf("@"));
+                            else if (singleCmd.ToUpper().Contains("@P"))
+                            {
+                                ints = (workPlate.WorkPlateX0 + value2) * workPlate.PXcale;
+                            }
+                            singleCmd = axi + actType + " " + ((int)ints).ToString() + singleCmd.Substring(singleCmd.LastIndexOf("@"));
                         }
                         else
-                            ints = (value) * workPlate.Xcale;
+                        {
+                            decimal value1 = decimal.Parse(singleCmd.Substring(2));
+                            ints = (workPlate.WorkPlateX0 + value1) * workPlate.Xcale;
+                            singleCmd = axi + actType + " " + ((int)ints).ToString();
+                        }
                     }
-                    else if (axi == "Y") ints = (value) * workPlate.Ycale;
-                    else if (axi == "Z") ints = (value) * workPlate.Zcale;
-                    else if (axi == "W") ints = (value) * workPlate.Wcale;
-                    // 线性关系修正参数（一般线性关系公式是y=kx+b）
-                    else if (axi == "P")
+                    else
                     {
-                        // if (workPlate.Pk != 0 && value != 0)
-                        //     ints = workPlate.Pk * (value + workPlate.Pb);
-                        // else
-                            ints = value * workPlate.Pcale;
-                    }
-                    else if (axi == "Q")
-                    {
-                        // if (workPlate.Pk != 0 && value != 0)
-                        //     ints = workPlate.Pk * (value + workPlate.Pb);
-                        // else
-                            ints = value * workPlate.Qcale;
-                    }
-                    else if (axi == "M") ints = value * workPlate.Mcale;
+                        decimal value = decimal.Parse(singleCmd.Substring(2));
+                        if (axi == "Y") ints = (workPlate.WorkPlateY0 + value) * workPlate.Ycale;
+                        if (axi == "Z") ints = (workPlate.WorkPlateZ0 + value) * workPlate.Zcale;
+                        if (axi == "W") ints = (workPlate.WorkPlateW0 + value) * workPlate.Wcale;
+                        // 线性关系修正参数（一般线性关系公式是y=kx+b）
+                        if (axi == "P")
+                        {
+                            if (workPlate.Pk != 0 && value != 0)
+                                ints = workPlate.Pk * (value + workPlate.Pb);
+                            else
+                                ints = value * workPlate.Pcale;
+                        }
+                        if (axi == "Q")
+                        {
+                            if (workPlate.Pk != 0 && value != 0)
+                                ints = workPlate.Pk * (value + workPlate.Pb);
+                            else
+                                ints = value * workPlate.Qcale;
+                        }
+                        if (axi == "M") ints = value * workPlate.Mcale;
 
-                    singleCmd = axi + actType + " " + (int)ints + tail;
+                        singleCmd = axi + actType + " " + ((int)ints).ToString();
+                    }
+                }
+                else if (actType == "S")
+                {
+                    if (axi == "X")
+                    {
+                        if (singleCmd.Contains("@"))
+                        {
+                            decimal value2 = decimal.Parse(singleCmd.Substring(2, singleCmd.LastIndexOf("@") - 2));
+                            if (singleCmd.ToUpper().Contains("@Z"))
+                            {
+                                ints = value2 * workPlate.ZXcale;
+                            }
+                            else if (singleCmd.ToUpper().Contains("@P"))
+                            {
+                                ints = value2 * workPlate.PXcale;
+                            }
+                            singleCmd = axi + actType + " " + ((int)ints).ToString() + singleCmd.Substring(singleCmd.LastIndexOf("@"));
+                        }
+                        else
+                        {
+                            decimal value1 = decimal.Parse(singleCmd.Substring(2));
+                            ints = (value1) * workPlate.Xcale;
+                            singleCmd = axi + actType + " " + ((int)ints).ToString();
+                        }
+                    }
+                    else
+                    {
+                        decimal value = decimal.Parse(singleCmd.Substring(2));
+                        if (axi == "Y") ints = (value) * workPlate.Ycale;
+                        if (axi == "Z") ints = (value) * workPlate.Zcale;
+                        if (axi == "W") ints = (value) * workPlate.Wcale;
+                        // 线性关系修正参数（一般线性关系公式是y=kx+b）
+                        if (axi == "P")
+                        {
+                            if (workPlate.Pk != 0 && value != 0)
+                                ints = workPlate.Pk * (value + workPlate.Pb);
+                            else
+                                ints = value * workPlate.Pcale;
+                        }
+                        if (axi == "Q")
+                        {
+                            if (workPlate.Pk != 0 && value != 0)
+                                ints = workPlate.Pk * (value + workPlate.Pb);
+                            else
+                                ints = value * workPlate.Qcale;
+                        }
+                        if (axi == "M") ints = value * workPlate.Mcale;
+
+                        singleCmd = axi + actType + " " + ((int)ints).ToString();
+                    }
                 }
             }
 

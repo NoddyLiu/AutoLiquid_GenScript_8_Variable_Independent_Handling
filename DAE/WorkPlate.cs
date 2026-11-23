@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
@@ -21,9 +21,8 @@ namespace DAERun
         private decimal wscale = 1.0m;
         private decimal qscale = 1.0m;
         private decimal mscale = 1.0m; // added by liu 2019-09-19
-
-        // 带@的轴，例如发XS100.0@XX、XS100.0@YY
-        private decimal zXscale = 1.0m;
+        private decimal pxcale = 1.0m;
+        private decimal zxcale = 1.0m;
 
         public decimal Xcale
         {
@@ -97,8 +96,28 @@ namespace DAERun
 
         public decimal ZXcale
         {
-            get { return zXscale; }
-            set { zXscale = value; }
+            get
+            {
+                return zxcale;
+            }
+
+            set
+            {
+                zxcale = value;
+            }
+        }
+
+        public decimal PXcale
+        {
+            get
+            {
+                return pxcale;
+            }
+
+            set
+            {
+                pxcale = value;
+            }
         }
 
         // 吸、喷液轴线性关系修正参数（一般线性关系公式是y=kx+b）

@@ -1782,7 +1782,13 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
         {
             var cmd = string.Empty;
             foreach (var ch in channels)
-                cmd += ObjectUtils.GetMotionCmd(HEAD_Z_AXIS_LIST[ch - 1], EActType.A, height.ToString("F2")) + ",";
+            {
+                if(ch > 1 && height > 0)
+                    // 高度大于0时，非第一个通道需要加上偏移量
+                    cmd += ObjectUtils.GetMotionCmd(HEAD_Z_AXIS_LIST[ch - 1], EActType.A, (height + ParamsHelper.Offsets.ZOffset[ch - 2]).ToString("F2")) + ",";
+                else
+                    cmd += ObjectUtils.GetMotionCmd(HEAD_Z_AXIS_LIST[ch - 1], EActType.A, height.ToString("F2")) + ",";
+            }
 
             return DoCmd(cmd.Substring(0, cmd.Length - 1), isNeedManualStop);
         }

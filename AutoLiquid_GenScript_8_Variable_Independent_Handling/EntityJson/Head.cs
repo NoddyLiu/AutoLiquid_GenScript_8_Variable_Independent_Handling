@@ -61,7 +61,7 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.EntityJson
          * 推脱板
          */
         // 退枪头是否使用推脱板（否：使用拉提方式）
-        public bool ReleaseTipUsePush = false;
+        public bool ReleaseTipUsePush = true;
         // 推脱板推脱次数
         public int ReleaseTipUsePushCount = 2;
         // 推脱板轴
