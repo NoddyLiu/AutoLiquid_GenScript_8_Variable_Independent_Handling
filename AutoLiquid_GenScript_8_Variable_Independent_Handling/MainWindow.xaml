@@ -60,6 +60,7 @@
 
             <StackPanel  x:Name="BottomBar" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,5,0">
                 <CheckBox x:Name="CheckBoxReplaceTipOverRange" Content="{StaticResource ReplaceTipOverRange}" FontSize="20" FontWeight="Bold" Visibility="Collapsed"/>
+                <Button x:Name="BtnUV" Content="{StaticResource UVOpen}" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Width="90" Height="40" FontSize="20" Margin="10,0,0,0"/>
                 <Button x:Name="BtnImportData" Content="{StaticResource Import}" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Width="70" Height="40" FontSize="20" Margin="10,0,0,0"/>
                 <Button x:Name="BtnReset" Content="{StaticResource Reset}" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Width="70" Height="40" FontSize="20" Margin="10,0,0,0"/>
                 <Button x:Name="BtnLaunchPlate" Content="{StaticResource LaunchPlate}" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Width="90" Height="40" FontSize="20" Margin="10,0,0,0"/>

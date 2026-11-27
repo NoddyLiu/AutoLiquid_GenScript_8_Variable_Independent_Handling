@@ -554,6 +554,10 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling
             // 推出盘位
             if (ParamsHelper.HeadList[0].YMoveWithHead)
                 this.BtnLaunchPlate.Visibility = Visibility.Collapsed;
+
+            // 紫外灯
+            if (!ParamsHelper.IO.UVAvailable)
+                this.BtnUV.Visibility = Visibility.Collapsed;
         }
 
         /// <summary>
@@ -629,6 +633,9 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling
             this.MenuItemUserSettingHead.Click += MenuItemOnClick;
             this.MenuItemModifyPwd.Click += MenuItemOnClick;
             this.MenuItemAbout.Click += MenuItemOnClick;
+
+            // 紫外灯
+            this.BtnUV.Click += BtnOnClick;
 
             // 运行
             this.BtnRun.Click += BtnOnClick;
@@ -880,6 +887,28 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling
             else if (sender.Equals(this.BtnContinue))
             {
                 SetLoadingStatus(ERunStatus.Continue);
+            }
+            // 紫外灯
+            else if (sender.Equals(this.BtnUV))
+            {
+                // CmdHelper.UVOpen(false);
+                // if (ParamsHelper.IO.LightAvailable)
+                //     CmdHelper.LightClose(false);
+
+                // 先决条件：如果存在门检测，就先判断门是否已关闭
+                if (ParamsHelper.IO.DoorAvailable)
+                {
+                    CmdHelper.DoorQuery(false);
+                    Thread.Sleep(100);
+                    // 仓门打开中
+                    if (!CmdHelper.frmDAE.IsDoorClosed)
+                    {
+                        MessageBox.Show((string)this.FindResource("Prompt_Door_Is_Opened_Please_Close_And_Try_Open_UV_Again"));
+                        return;
+                    }
+                }
+                WindowUV wuv = new WindowUV();
+                wuv.ShowDialog();
             }
         }
 
@@ -1846,9 +1875,12 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling
                     (dataRows.Count + tipBoxCapacity - 1) / tipBoxCapacity);
                 var tipIndexSet = new HashSet<int>(ConstantsUtils.TipTemplateIndexList.Take(totalTipBoxCount));
 
-                // 盘位21（index=20）固定作为退枪头位置，源盘/靶盘不可占用
+                //// 盘位21（index=20）固定作为退枪头位置，源盘/靶盘不可占用
+                //var availablePlateSlots = Enumerable.Range(0, totalTemplateCount)
+                //    .Where(idx => !tipIndexSet.Contains(idx) && idx != ConstantsUtils.ReleaseTipTemplateIndex)
+                //    .ToList();
                 var availablePlateSlots = Enumerable.Range(0, totalTemplateCount)
-                    .Where(idx => !tipIndexSet.Contains(idx) && idx != ConstantsUtils.ReleaseTipTemplateIndex)
+                    .Where(idx => !tipIndexSet.Contains(idx))
                     .ToList();
                 int maxPlatesPerRound = availablePlateSlots.Count;
 

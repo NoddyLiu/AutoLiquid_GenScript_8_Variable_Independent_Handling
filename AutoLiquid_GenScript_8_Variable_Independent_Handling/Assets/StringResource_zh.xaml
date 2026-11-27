@@ -15,6 +15,7 @@
     <s:String x:Key="LaunchPlate">推出盘位</s:String>
     <s:String x:Key="ResetX">X轴复位</s:String>
     <s:String x:Key="ResetY">Y轴复位</s:String>
+    <s:String x:Key="ResetBigZ">大Z复位</s:String>
     <s:String x:Key="ResetZ">Z1~Z8轴复位</s:String>
     <s:String x:Key="ResetP">P1~P8轴复位</s:String>
     <s:String x:Key="ResetW">变距轴复位</s:String>

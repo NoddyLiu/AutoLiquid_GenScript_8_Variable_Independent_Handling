@@ -149,6 +149,7 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Window
         {
             this.BtnResetX.Click += BtnClick;
             this.BtnResetY.Click += BtnClick;
+            this.BtnResetBigZ.Click += BtnClick;
             this.BtnResetZ.Click += BtnClick;
             this.BtnResetW.Click += BtnClick;
             this.BtnResetP.Click += BtnClick;
@@ -176,10 +177,18 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Window
                     {
                     });
             }
-            else if (sender.Equals(this.BtnResetZ))
+            else if (sender.Equals(this.BtnResetBigZ))
             {
                 BackgroundProcess.RunAsync(
                     delegate () { CmdHelper.Zi(); },
+                    delegate ()
+                    {
+                    });
+            }
+            else if (sender.Equals(this.BtnResetZ))
+            {
+                BackgroundProcess.RunAsync(
+                    delegate () { CmdHelper.ZNi(); },
                     delegate ()
                     {
                     });

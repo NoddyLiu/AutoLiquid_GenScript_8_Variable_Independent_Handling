@@ -133,5 +133,10 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.EntityJson
          * 盘位摆放（即A1方向）
          */
         public EA1Pos A1Pos = EA1Pos.LeftTop;
+
+        /**
+         * 大Z轴最大高度
+         */
+        public decimal BigZMax { get; set; } = 100.0m;
     }
 }

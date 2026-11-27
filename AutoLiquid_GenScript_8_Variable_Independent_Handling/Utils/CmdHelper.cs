@@ -1,7 +1,9 @@
-﻿using AutoLiquid_Library.Enum;
+﻿using AutoLiquid_GenScript_8_Variable_Independent_Handling;
+using AutoLiquid_GenScript_8_Variable_Independent_Handling.EntityCommon;
+using AutoLiquid_GenScript_8_Variable_Independent_Handling.EntityJson;
+using AutoLiquid_Library.Enum;
 using AutoLiquid_Library.Exceptions;
 using AutoLiquid_Library.Utils;
-using AutoLiquid_GenScript_8_Variable_Independent_Handling;
 using ControlzEx.Standard;
 using Serilog;
 using System;
@@ -10,14 +12,13 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Media3D;
-using AutoLiquid_GenScript_8_Variable_Independent_Handling.EntityCommon;
-using AutoLiquid_GenScript_8_Variable_Independent_Handling.EntityJson;
 
 namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
 {
@@ -37,7 +38,9 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
         private static List<string> HEAD_X_AXIS_LIST = new List<string> { "X", "X" };
         // 移液头前后轴列表
         private static List<string> HEAD_Y_AXIS_LIST = new List<string> { "Y", "Y" };
-        // 移液头上下轴列表
+        // 移液头大Z轴列表
+        private static List<string> HEAD_BIG_Z_AXIS_LIST = new List<string> { "Z", "Z" };
+        // 移液头8道上下轴列表
         private static List<string> HEAD_Z_AXIS_LIST = new List<string> { "@Z1", "@Z2", "@Z3", "@Z4", "@Z5", "@Z6", "@Z7", "@Z8", };
         // 移液头喷液轴列表
         public static List<string> HEAD_P_AXIS_LIST = new List<string> { "@P1", "@P2", "@P3", "@P4", "@P5", "@P6", "@P7", "@P8" };
@@ -92,19 +95,21 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
              * Z、P轴
              */
             var result1 = Zi(isNeedManualStop);
-            var result2 = Pi(isNeedManualStop);
+            var result2 = ZNi(isNeedManualStop);
+            var result3 = Pi(isNeedManualStop);
             // 第一次复位，多做一次复位指令。避免还没建立通信，复位不了
             if (isFirstTimeInit)
             {
                 result1 = Zi(isNeedManualStop);
-                result2 = Pi(isNeedManualStop);
+                result2 = ZNi(isNeedManualStop);
+                result3 = Pi(isNeedManualStop);
             }
 
             /**
              * 变距轴
              */
             var resetVariable = ObjectUtils.GetMotionCmd(HEAD_Variable_AXIS_LIST[0], EActType.I, "");
-            var result3 = DoCmd(resetVariable, isNeedManualStop);
+            var result4 = DoCmd(resetVariable, isNeedManualStop);
 
             /**
              * X、Y轴
@@ -127,7 +132,7 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
                         resetXAndY += "," + ObjectUtils.GetMotionCmd(HEAD_X_AXIS_LIST[1], EActType.I, "");
                 }
             }
-            var result4 = DoCmd(resetXAndY, isNeedManualStop);
+            var result5 = DoCmd(resetXAndY, isNeedManualStop);
 
             // 更新移液头状态信息
             headStatusList[0].Head = EHeadStatus.TipReleased;
@@ -137,7 +142,7 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
             headStatusList[1].VolumeAbsorbMoreLeft = 0m;
             headStatusList[1].VolumeAirLeft = 0m;
 
-            return result1 && result2 && result3 && result4;
+            return result1 && result2 && result3 && result4 && result5;
         }
 
         /// <summary>
@@ -1509,12 +1514,12 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
             GotoHeight(multiChannels, (isMidwayOrZa0 ? 0 : prepareReleaseTipPos.Z) + offsetTemplate.Z, isNeedManualStop);
             /**
              * 变距
-             * ①如果退枪头是卡扣，且设置了退枪头变距参数，就使用退枪头变距参数
+             * ①如果设置了退枪头变距参数，就使用退枪头变距参数
              * ②否则，就使用枪头盒变距参数
              */
             if (isVariableDistance)
             {
-                if (!releaseTipUsePush && commonSetting.ReleaseTipVariableDistanceStep != 0)
+                if (commonSetting.ReleaseTipVariableDistanceStep != 0)
                     Wa(headUsedIndex, commonSetting.ReleaseTipVariableDistanceStep, isNeedManualStop);
                 else
                     Wa(headUsedIndex, commonSetting.Consumables[0].VariableDistanceStep, isNeedManualStop);
@@ -1614,7 +1619,7 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
             else if (releaseTipZa0After)
             {
                 GotoHeight(multiChannels, 0 + offsetTemplate.Z, isNeedManualStop);
-                Zi(isNeedManualStop);
+                ZNi(isNeedManualStop);
             }
             // 如果退枪头高度 > 枪头盒行走高度
             else if (releaseTipPos.Z > tipBoxNormalHeight)
@@ -1751,12 +1756,12 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
             var ya = consumableType.HoleStartPosList[templateIndex].Y;
             if (ParamsHelper.HeadList[headUsedIndex].Available && ParamsHelper.HeadList[headUsedIndex].YMoveWithHead)
                 ya = commonSetting.A1Pos == EA1Pos.LeftTop
-                    ? ya - consumableType.HoleStep.Y * yIndex
-                    : ya + consumableType.HoleStep.Y * yIndex;
-            else
-                ya = commonSetting.A1Pos == EA1Pos.LeftTop
                     ? ya + consumableType.HoleStep.Y * yIndex
                     : ya - consumableType.HoleStep.Y * yIndex;
+            else
+                ya = commonSetting.A1Pos == EA1Pos.LeftTop
+                   ? ya - consumableType.HoleStep.Y * yIndex
+                    : ya + consumableType.HoleStep.Y * yIndex;
             // 赋值位置信息
             pos.X = xa;
             pos.Y = ya;
@@ -1780,17 +1785,42 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
         /// <param name="isNeedManualStop">是否需要手动停止功能</param>
         public static bool GotoHeight(List<int> channels, decimal height, bool isNeedManualStop = false)
         {
+            bool result = false;
             var cmd = string.Empty;
-            foreach (var ch in channels)
+            var bigZMax = ParamsHelper.CommonSettingList[0].BigZMax;
+
+            // 逐个通道执行高度命令
+            if (height > bigZMax)
             {
-                if(ch > 1 && height > 0)
+                result = Za(bigZMax, isNeedManualStop);
+                foreach (var ch in channels)
+                {
+                    var temp = height;
                     // 高度大于0时，非第一个通道需要加上偏移量
-                    cmd += ObjectUtils.GetMotionCmd(HEAD_Z_AXIS_LIST[ch - 1], EActType.A, (height + ParamsHelper.Offsets.ZOffset[ch - 2]).ToString("F2")) + ",";
-                else
-                    cmd += ObjectUtils.GetMotionCmd(HEAD_Z_AXIS_LIST[ch - 1], EActType.A, height.ToString("F2")) + ",";
+                    if (ch > 1 && height > 0)
+                    {
+                        temp = height + ParamsHelper.Offsets.ZOffset[ch - 2];
+                    }
+
+                    var channelHeight = temp - bigZMax;
+                    if (result)
+                    {
+                        cmd = ObjectUtils.GetMotionCmd(HEAD_Z_AXIS_LIST[ch - 1], EActType.A, channelHeight.ToString("F2"));
+                        result = DoCmd(cmd, isNeedManualStop) && result;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var ch in channels)
+                {
+                    cmd += ObjectUtils.GetMotionCmd(HEAD_Z_AXIS_LIST[ch - 1], EActType.A, 0.ToString("F2")) + ",";
+                }
+                result = DoCmd(cmd.Substring(0, cmd.Length - 1), isNeedManualStop) && result;
+                result = Za(height, isNeedManualStop);
             }
 
-            return DoCmd(cmd.Substring(0, cmd.Length - 1), isNeedManualStop);
+            return result;
         }
 
         /// <summary>
@@ -1830,11 +1860,32 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
         }
 
         /// <summary>
-        /// ZI
+        /// ZI （大Z）
+        /// </summary>
+        /// <param name="isNeedManualStop"></param>
+        public static bool Zi(bool isNeedManualStop = false)
+        {
+            return DoCmd(HEAD_BIG_Z_AXIS_LIST[0] + "I", isNeedManualStop);
+        }
+
+        /// <summary>
+        /// ZA（大Z）
+        /// </summary>
+        /// <param name="z"></param>
+        /// <param name="isNeedManualStop"></param>
+        /// <returns></returns>
+        public static bool Za(decimal z, bool isNeedManualStop = false)
+        {
+            var cmd = ObjectUtils.GetMotionCmd(HEAD_BIG_Z_AXIS_LIST[0], EActType.A, z.ToString("F2"));
+            return DoCmd(cmd, isNeedManualStop);
+        }
+
+        /// <summary>
+        /// ZNi（8道小Z复位）
         /// </summary>
         /// <param name="headUsedIndex">移液头Index</param>
         /// <param name="isNeedManualStop"></param>
-        public static bool Zi(bool isNeedManualStop = false)
+        public static bool ZNi(bool isNeedManualStop = false)
         {
             var cmd = "";
             for (int i = 1; i <= 8; i++)
@@ -2059,7 +2110,7 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
                 SpeedSetSub(HEAD_X_AXIS_LIST[headUsedIndex], commonSetting.DefaultXSpeed, commonSetting.XSpeedPercent, isNeedManualStop);
                 if (ParamsHelper.HeadList[headUsedIndex].YAvailable)
                     SpeedSetSub(HEAD_Y_AXIS_LIST[headUsedIndex], commonSetting.DefaultYSpeed, commonSetting.YSpeedPercent, isNeedManualStop);
-                //SpeedSetSub(HEAD_Z_AXIS_LIST[headUsedIndex], commonSetting.DefaultZSpeed, commonSetting.ZSpeedPercent, isNeedManualStop);
+                SpeedSetSub(HEAD_BIG_Z_AXIS_LIST[headUsedIndex], commonSetting.DefaultZSpeed, commonSetting.ZSpeedPercent, isNeedManualStop);
                 //if (ParamsHelper.HeadList[headUsedIndex].PAvailable)
                 //    SpeedSetSub(HEAD_P_AXIS_LIST[headUsedIndex], commonSetting.DefaultPSpeed, commonSetting.PSpeedPercent, isNeedManualStop);
                 var zSpeedCmd = "";
@@ -2084,10 +2135,12 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
             }
             else if (axis == EAxis.Z)
             {
+                SpeedSetSub(HEAD_BIG_Z_AXIS_LIST[headUsedIndex], speedCmd, speedPercent, isNeedManualStop);
+
                 var zSpeedCmd = "";
                 for (var x = 1; x < 9; x++)
                 {
-                    speedCmd = ObjectUtils.CalcSpeedCmdValueByPercent(HEAD_Z_AXIS_LIST[x - 1], commonSetting.DefaultZSpeed, commonSetting.ZSpeedPercent);
+                    speedCmd = ObjectUtils.CalcSpeedCmdValueByPercent(HEAD_Z_AXIS_LIST[x - 1], speedCmd, speedPercent);
                     if (speedCmd != "")
                         zSpeedCmd += speedCmd + ",";
                 }
@@ -2101,7 +2154,7 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
                     for (var x = 1; x < 9; x++)
                     {
                         speedCmd = ObjectUtils.CalcSpeedCmdValueByPercent(HEAD_P_AXIS_LIST[x - 1], commonSetting.DefaultPSpeed, commonSetting.PSpeedPercent);
-                        if(speedCmd != "")
+                        if (speedCmd != "")
                             pSpeedCmd += speedCmd + ",";
                     }
                 if (!string.IsNullOrEmpty(pSpeedCmd))

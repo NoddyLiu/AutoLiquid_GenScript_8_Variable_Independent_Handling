@@ -342,28 +342,28 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
 
                             var oriIndex = takeTipLeft2Right ? tipUsedIndexThisTimeList.First().Col * tipBoxUsedStatusRow : tipUsedIndexThisTimeList.Last().Col * tipBoxUsedStatusRow;
                             // 取枪头通道数与移液头通道数一致，取枪头位置不需要偏移
-                            if (!isTakeTipFlexible)
+                            //if (!isTakeTipFlexible)
                                 tipTakeStartIndex = new HoleIndex { OriIndex = oriIndex + tipStartRowIndex };
-                            else
-                            {
-                                /**
-                                * 移液头偏移逻辑：
-                                * ①移液头多列，整列取：X轴偏移
-                                * ②移液头多列，灵活取：X、Y轴偏移
-                                * ③移液头单列，Y轴偏移
-                                */
-                                var xHoleOffset = takeTipLeft2Right ? tipChannelCol - headChannelCol : 0;
-                                var yHoleOffset = (tipStartRowIndex - (tipBoxUsedStatusRow - tipChannelRow)) * yDirectionFactor;
-                                if (headChannelCol > 1)
-                                {
-                                    if (tipChannelRow == headChannelRow)
-                                        tipTakeStartIndex = new HoleIndex { OriIndex = oriIndex };
-                                    else
-                                        tipTakeStartIndex = new HoleIndex { OriIndex = oriIndex };
-                                }
-                                else
-                                    tipTakeStartIndex = new HoleIndex { OriIndex = oriIndex};
-                            }
+                            //else
+                            //{
+                            //    /**
+                            //    * 移液头偏移逻辑：
+                            //    * ①移液头多列，整列取：X轴偏移
+                            //    * ②移液头多列，灵活取：X、Y轴偏移
+                            //    * ③移液头单列，Y轴偏移
+                            //    */
+                            //    var xHoleOffset = takeTipLeft2Right ? tipChannelCol - headChannelCol : 0;
+                            //    var yHoleOffset = (tipStartRowIndex - (tipBoxUsedStatusRow - tipChannelRow)) * yDirectionFactor;
+                            //    if (headChannelCol > 1)
+                            //    {
+                            //        if (tipChannelRow == headChannelRow)
+                            //            tipTakeStartIndex = new HoleIndex { OriIndex = oriIndex };
+                            //        else
+                            //            tipTakeStartIndex = new HoleIndex { OriIndex = oriIndex };
+                            //    }
+                            //    else
+                            //        tipTakeStartIndex = new HoleIndex { OriIndex = oriIndex};
+                            //}
 
                             isBreakParentLoop = true;
                             break;

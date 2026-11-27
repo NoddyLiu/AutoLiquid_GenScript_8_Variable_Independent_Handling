@@ -299,11 +299,12 @@ namespace DAERun
 
             if (singleCmd.Contains('.'))  //如果值中含有小数点，则数字单位为毫米，需要转换成步数
             {
+
                 if (singleCmd.ToUpper().StartsWith("WAIT"))
                 {
                     decimal value = decimal.Parse(singleCmd.Substring(4));
                     ints = value * 10;
-                    singleCmd = "WAIT " + (int)ints;
+                    singleCmd = "WATI " + ((int)ints).ToString();
 
                 }
                 else if (actType == "A")

@@ -26,7 +26,7 @@ namespace AutoLiquid_GenScript_8_Variable_Independent_Handling.Utils
         public static List<int> TipTemplateIndexList = new List<int> { 0, 5, 10, 15 };
 
         // 退枪头固定盘位Index
-        public static int ReleaseTipTemplateIndex = 20;
+        //public static int ReleaseTipTemplateIndex = 20;
 
         // EP管架固定盘位Index（EP管架的摆放位置，最左上角盘位Index）
         public static List<int> EPTemplateIndexList = new List<int> { 1, 3, 6, 8 };
